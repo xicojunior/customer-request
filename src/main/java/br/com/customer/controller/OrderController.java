@@ -21,23 +21,15 @@ public class OrderController {
         this.orderService = orderService;
     }
 
-    //@PostMapping(consumes = {"application/json", "application/xml"})
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE} )
     public ResponseEntity<List<Order>> createOrder(@RequestBody List<Order> orders) {
         if (orders.size() > 10) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
 
-        /*
-        for (Order order : orders) {
-            orderService.createOrder(order);
-        }
-         */
-
         List<Order> newListOrder = orderService.createOrderList(orders);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(newListOrder);
-        //return ResponseEntity.status(HttpStatus.CREATED).body(orders);
     }
 
     @GetMapping
@@ -47,8 +39,6 @@ public class OrderController {
 
         List<Order> orders;
         if (numberControl != null || dateRegistration != null) {
-            //DateTimeFormatter parser = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            //LocalDate date = LocalDate.parse(dateRegistration, parser);
             orders = orderService.findOrders(numberControl, dateRegistration);
         } else {
             orders = orderService.findAllOrders();

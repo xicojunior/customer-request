@@ -1,5 +1,6 @@
 package br.com.customer.service;
 
+import br.com.customer.model.ClientOrder;
 import br.com.customer.model.Order;
 import br.com.customer.repository.ClientOrderRepository;
 import br.com.customer.repository.OrderRepository;
@@ -9,13 +10,20 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import javax.swing.text.DateFormatter;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.ParseException;
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 class OrderServiceTest {
@@ -35,126 +43,127 @@ class OrderServiceTest {
     }
 
     @Test
-    //Teste Criando nova lista
-    void createOrderList_ShouldCreateOrdersAndReturnNewList() {
-        // Arrange
-        Order order1 = new Order();
-        order1.setNumberControl("12345");
-        order1.setUnitValue(new BigDecimal("100.50"));
-        order1.setAmount(3);
+    void testCreateOrder() {
+        Order order = new Order();
+        order.setNumberControl("12345");
+        order.setUnitValue(BigDecimal.valueOf(100.50));
+        order.setAmount(3);
+        order.setDateRegistration(null); // Not setting date to test default date setting
 
-        Order order2 = new Order();
-        order2.setNumberControl("12346");
-        order2.setUnitValue(new BigDecimal("50.00"));
-        order2.setAmount(1);
+        when(orderRepository.existsByNumberControl(any(String.class))).thenReturn(false);
+        when(orderRepository.save(any(Order.class))).thenAnswer(i -> i.getArguments()[0]);
 
-        when(orderRepository.existsByNumberControl("12345")).thenReturn(false);
-        when(orderRepository.existsByNumberControl("12346")).thenReturn(false);
-        when(orderRepository.save(any(Order.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        Order savedOrder = orderService.createOrder(order);
 
-        List<Order> listOrder = Arrays.asList(order1, order2);
-
-        // Act
-        List<Order> result = orderService.createOrderList(listOrder);
-
-        // Assert
-        assertEquals(2, result.size());
-        assertNotNull(result.get(0).getTotalValue());
-        assertNotNull(result.get(1).getTotalValue());
-        verify(orderRepository, times(2)).save(any(Order.class));
+        assertNotNull(savedOrder);
+        assertEquals("12345", savedOrder.getNumberControl());
+        assertNotNull(savedOrder.getDateRegistration());
+        assertEquals(BigDecimal.valueOf(301.50), savedOrder.getTotalValue());
     }
 
     @Test
-    //Teste numero de controle duplicado
-    void createOrder_ShouldReturnError_WhenNumberControlExists() {
-        // Arrange
+    void testCreateOrderWithDiscount() {
         Order order = new Order();
-        order.setNumberControl("12345");
+        order.setNumberControl("12346");
+        order.setUnitValue(BigDecimal.valueOf(100.50));
+        order.setAmount(10);
 
-        when(orderRepository.existsByNumberControl("12345")).thenReturn(true);
+        when(orderRepository.existsByNumberControl(any(String.class))).thenReturn(false);
+        when(orderRepository.save(any(Order.class))).thenAnswer(i -> i.getArguments()[0]);
 
-        // Act
+        Order savedOrder = orderService.createOrder(order);
+
+        assertNotNull(savedOrder);
+        assertEquals("12346", savedOrder.getNumberControl());
+        assertEquals(BigDecimal.valueOf(904.50).setScale(2, RoundingMode.HALF_UP), savedOrder.getTotalValue()); // 10% discount applied
+    }
+
+    @Test
+    void testCreateOrderWithDuplicateNumberControl() {
+        Order order = new Order();
+        order.setNumberControl("12347");
+        order.setUnitValue(BigDecimal.valueOf(50.00));
+        order.setAmount(5);
+
+        when(orderRepository.existsByNumberControl("12347")).thenReturn(true);
+
         Order result = orderService.createOrder(order);
 
-        // Assert
-        assertEquals("Número de controle já existe.", result.getError());
+        assertNull(result.getTotalValue()); // The order should not be processed
+        assertEquals("Número de controle já existe. Não inserido no banco de dados", result.getError());
         verify(orderRepository, never()).save(any(Order.class));
     }
 
     @Test
-    //Teste valroes padrão (data e quantidade) sao definidos corretamente se nulos
-    void createOrder_ShouldSetDefaultValues_WhenFieldsAreNull() {
-        // Arrange
-        Order order = new Order();
-        order.setNumberControl("12345");
-        order.setUnitValue(new BigDecimal("100.00"));
-
-        when(orderRepository.existsByNumberControl("12345")).thenReturn(false);
-        when(orderRepository.save(any(Order.class))).thenAnswer(invocation -> invocation.getArgument(0));
-
-        // Act
-        Order result = orderService.createOrder(order);
-
-        // Assert
-        assertEquals(1, result.getAmount());
-        assertEquals(LocalDate.now(), result.getDateRegistration());
-        assertEquals(new BigDecimal("100.00"), result.getTotalValue());
-        verify(orderRepository).save(any(Order.class));
-    }
-
-    @Test
-    //Testa os descontos de 10% e 5% dependendo das quantidades
-    void createOrder_ShouldApplyDiscounts_WhenAmountIsGreaterThan5Or10() {
-        // Arrange
-        Order order = new Order();
-        order.setNumberControl("12345");
-        order.setUnitValue(new BigDecimal("100.00"));
-        order.setAmount(10);
-
-        when(orderRepository.existsByNumberControl("12345")).thenReturn(false);
-        when(orderRepository.save(any(Order.class))).thenAnswer(invocation -> invocation.getArgument(0));
-
-        // Act
-        Order result = orderService.createOrder(order);
-
-        // Assert
-        assertEquals(new BigDecimal("900.00"), result.getTotalValue()); // 10% de desconto
-        verify(orderRepository).save(any(Order.class));
-    }
-
-    @Test
-    //testa a busca pelo numero de controle ou pela data
-    void findOrders_ShouldReturnOrdersBasedOnNumberControlOrDate() {
-        // Arrange
+    void testCreateOrderList() {
         Order order1 = new Order();
-        order1.setNumberControl("12345");
-        order1.setDateRegistration(LocalDate.of(2024, 8, 26));
+        order1.setNumberControl("12348");
+        order1.setUnitValue(BigDecimal.valueOf(20.00));
+        order1.setAmount(2);
 
-        when(orderRepository.findByNumberControlOrDateRegistration(anyString(), any(LocalDate.class)))
-                .thenReturn(Arrays.asList(order1));
+        Order order2 = new Order();
+        order2.setNumberControl("12349");
+        order2.setUnitValue(BigDecimal.valueOf(30.00));
+        order2.setAmount(1);
 
-        // Act
-        List<Order> result = orderService.findOrders("12345", "26/08/2024");
+        when(orderRepository.existsByNumberControl(any(String.class))).thenReturn(false);
+        when(orderRepository.save(any(Order.class))).thenAnswer(i -> i.getArguments()[0]);
 
-        // Assert
-        assertEquals(1, result.size());
-        verify(orderRepository).findByNumberControlOrDateRegistration(anyString(), any(LocalDate.class));
+        List<Order> orders = Arrays.asList(order1, order2);
+        List<Order> savedOrders = orderService.createOrderList(orders);
+
+        assertEquals(2, savedOrders.size());
+        verify(orderRepository, times(2)).save(any(Order.class));
     }
 
     @Test
-    //testa retornar todos
-    void findAllOrders_ShouldReturnAllOrders() {
-        // Arrange
+    void testFindOrders() {
+        Order order = new Order();
+        order.setNumberControl("12350");
+        order.setDateRegistration(LocalDate.now());
+
+        LocalDate today = LocalDate.now();
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        String strToday = today.format(dateTimeFormatter);
+
+        order.setUnitValue(BigDecimal.valueOf(100.00));
+        order.setAmount(5);
+
+        when(orderRepository.findByNumberControlOrDateRegistration(any(String.class), any(LocalDate.class)))
+                .thenReturn(Arrays.asList(order));
+
+        List<Order> orders = orderService.findOrders("12350", strToday);
+
+        assertNotNull(orders);
+        assertEquals(1, orders.size());
+        assertEquals("12350", orders.get(0).getNumberControl());
+    }
+
+    @Test
+    void testFindAllOrders() {
         Order order1 = new Order();
-        order1.setNumberControl("12345");
+        order1.setNumberControl("12351");
 
-        when(orderRepository.findAll()).thenReturn(Arrays.asList(order1));
+        Order order2 = new Order();
+        order2.setNumberControl("12352");
 
-        // Act
-        List<Order> result = orderService.findAllOrders();
+        when(orderRepository.findAll()).thenReturn(Arrays.asList(order1, order2));
 
-        // Assert
-        assertEquals(1, result.size());
-        verify(orderRepository).findAll();
+        List<Order> orders = orderService.findAllOrders();
+
+        assertEquals(2, orders.size());
+    }
+
+    @Test
+    void testCreateClientOrder() {
+        ClientOrder clientOrder = new ClientOrder();
+        clientOrder.setTotalShipping(BigDecimal.valueOf(50.00));
+
+        when(clientOrderRepository.save(any(ClientOrder.class))).thenAnswer(i -> i.getArguments()[0]);
+
+        ClientOrder savedClientOrder = orderService.createClietOrder();
+
+        assertNotNull(savedClientOrder);
+        verify(clientOrderRepository, times(1)).save(any(ClientOrder.class));
     }
 }
