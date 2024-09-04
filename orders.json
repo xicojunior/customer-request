@@ -1,0 +1,82 @@
+[
+    {
+        "numberControl": "12346",
+        "dateRegistration": "2024-08-02",
+        "productName": "Produto B",
+        "unitValue": 200.03,
+        "amount": 6,
+        "codeCustomer": 2
+    },
+    {
+        "numberControl": "12347",
+        "dateRegistration": "2024-08-03",
+        "productName": "Produto C",
+        "unitValue": 300.04,
+        "amount": 7,
+        "codeCustomer": 3
+    },
+    {
+        "numberControl": "12348",
+        "dateRegistration": "2024-08-04",
+        "productName": "Produto D",
+        "unitValue": 400.05,
+        "amount": 8,
+        "codeCustomer": 4
+    },
+    {
+        "numberControl": "12349",
+        "dateRegistration": "2024-08-05",
+        "productName": "Produto E",
+        "unitValue": 500.06,
+        "amount": 9,
+        "codeCustomer": 5
+    },
+    {
+        "numberControl": "12350",
+        "dateRegistration": "2024-08-06",
+        "productName": "Produto F",
+        "unitValue": 600.07,
+        "amount": 10,
+        "codeCustomer": 6
+    },
+    {
+        "numberControl": "12351",
+        "dateRegistration": "2024-08-07",
+        "productName": "Produto G",
+        "unitValue": 700.08,
+        "amount": 11,
+        "codeCustomer": 7
+    },
+    {
+        "numberControl": "12352",
+        "dateRegistration": "2024-08-08",
+        "productName": "Produto H",
+        "unitValue": 800.09,
+        "amount": 12,
+        "codeCustomer": 8
+    },
+    {
+        "numberControl": "12353",
+        "dateRegistration": "2024-08-09",
+        "productName": "Produto I",
+        "unitValue": 900.10,
+        "amount": 13,
+        "codeCustomer": 9
+    },
+    {
+        "numberControl": "12354",
+        "dateRegistration": "2024-08-10",
+        "productName": "Produto J",
+        "unitValue": 1000.11,
+        "amount": 14,
+        "codeCustomer": 10
+    },
+    {
+        "numberControl": "12355",
+        "dateRegistration": "2024-08-11",
+        "productName": "Produto K",
+        "unitValue": 1100.12,
+        "amount": 15,
+        "codeCustomer": 1
+    }
+]

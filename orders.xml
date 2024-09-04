@@ -1,0 +1,82 @@
+<Orders>
+    <Order>
+        <numberControl>12346</numberControl>
+        <dateRegistration>2024-08-02</dateRegistration>
+        <productName>Produto B</productName>
+        <unitValue>200.03</unitValue>
+        <amount>6</amount>
+        <codeCustomer>2</codeCustomer>
+    </Order>
+    <Order>
+        <numberControl>12347</numberControl>
+        <dateRegistration>2024-08-03</dateRegistration>
+        <productName>Produto C</productName>
+        <unitValue>300.04</unitValue>
+        <amount>7</amount>
+        <codeCustomer>3</codeCustomer>
+    </Order>
+    <Order>
+        <numberControl>12348</numberControl>
+        <dateRegistration>2024-08-04</dateRegistration>
+        <productName>Produto D</productName>
+        <unitValue>400.05</unitValue>
+        <amount>8</amount>
+        <codeCustomer>4</codeCustomer>
+    </Order>
+    <Order>
+        <numberControl>12349</numberControl>
+        <dateRegistration>2024-08-05</dateRegistration>
+        <productName>Produto E</productName>
+        <unitValue>500.06</unitValue>
+        <amount>9</amount>
+        <codeCustomer>5</codeCustomer>
+    </Order>
+    <Order>
+        <numberControl>12350</numberControl>
+        <dateRegistration>2024-08-06</dateRegistration>
+        <productName>Produto F</productName>
+        <unitValue>600.07</unitValue>
+        <amount>10</amount>
+        <codeCustomer>6</codeCustomer>
+    </Order>
+    <Order>
+        <numberControl>12351</numberControl>
+        <dateRegistration>2024-08-07</dateRegistration>
+        <productName>Produto G</productName>
+        <unitValue>700.08</unitValue>
+        <amount>11</amount>
+        <codeCustomer>7</codeCustomer>
+    </Order>
+    <Order>
+        <numberControl>12352</numberControl>
+        <dateRegistration>2024-08-08</dateRegistration>
+        <productName>Produto H</productName>
+        <unitValue>800.09</unitValue>
+        <amount>12</amount>
+        <codeCustomer>8</codeCustomer>
+    </Order>
+    <Order>
+        <numberControl>12353</numberControl>
+        <dateRegistration>2024-08-09</dateRegistration>
+        <productName>Produto I</productName>
+        <unitValue>900.10</unitValue>
+        <amount>13</amount>
+        <codeCustomer>9</codeCustomer>
+    </Order>
+    <Order>
+        <numberControl>12354</numberControl>
+        <dateRegistration>2024-08-10</dateRegistration>
+        <productName>Produto J</productName>
+        <unitValue>1000.11</unitValue>
+        <amount>14</amount>
+        <codeCustomer>10</codeCustomer>
+    </Order>
+    <Order>
+        <numberControl>12355</numberControl>
+        <dateRegistration>2024-08-11</dateRegistration>
+        <productName>Produto K</productName>
+        <unitValue>1100.12</unitValue>
+        <amount>15</amount>
+        <codeCustomer>1</codeCustomer>
+    </Order>
+</Orders>
